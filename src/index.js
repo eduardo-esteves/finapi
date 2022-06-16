@@ -28,6 +28,19 @@ app.post('/account', (req, resp) => {
 
 })
 
+app.get('/statement/:cpf', (req, resp) => {
+
+  const { cpf } = req.params
+  const client = customers.find(customer => customer.cpf === parseInt(cpf))
+
+  if(!client) {
+    return resp.status(400).json({error: 'Customer not exists!'})
+  }
+
+  return resp.send(customers.statement)
+
+})
+
 
 
 app.listen(3000)
