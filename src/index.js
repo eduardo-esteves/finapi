@@ -28,9 +28,11 @@ app.post('/account', (req, resp) => {
 
 })
 
-app.get('/statement/:cpf', (req, resp) => {
+app.get('/statement', (req, resp) => {
 
-  const { cpf } = req.params
+  console.log(req.headers)
+
+  const { cpf } = req.headers
   const client = customers.find(customer => customer.cpf === parseInt(cpf))
 
   if(!client) {
