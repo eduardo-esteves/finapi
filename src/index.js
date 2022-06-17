@@ -77,5 +77,25 @@ app.post('/deposit', verifyIfExistsAccountCPF, (req, resp) => {
 
 })
 
+// Retorna o extrato bancário de um cliente existente em uma determinada data
+app.get('/statement/by_date', verifyIfExistsAccountCPF, (req, resp) => {
+
+  const { customer } = req
+  const { date } = req.query
+
+  const dateFormat = new Date(date + ' 00:00')
+
+  debugger
+
+  const statement = customer.statement.filter(stat => stat.created_at.toDateString() === new Date(dateFormat).toDateString())
+
+  if(statement.length <= 0) {
+    return resp.status(400).json({error: 'Any statement find!'})
+  }
+
+  return resp.send(statement)
+
+})
+
 
 app.listen(3000)
