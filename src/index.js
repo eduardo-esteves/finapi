@@ -7,6 +7,24 @@ app.use(express.json())
 const customers = []
 
 
+// Middleware
+function verifyIfExistsAccountCPF(req, resp, next) {
+
+  const { cpf } = req.headers
+  const customer = customers.find(customer => customer.cpf === parseInt(cpf))
+
+  if(!customer) {
+    return resp.status(400).json({error: 'Customer not exists!'})
+  }
+
+  // Repassando o customer para todas as rotas que invocarem este middleware.
+  req.customer = customer
+
+  return next()
+
+}
+
+
 app.post('/account', (req, resp) => {
 
   const {name, cpf} = req.body
@@ -28,18 +46,12 @@ app.post('/account', (req, resp) => {
 
 })
 
-app.get('/statement', (req, resp) => {
+// app.use(verifyIfExistsAccountCPF)
 
-  console.log(req.headers)
+app.get('/statement', verifyIfExistsAccountCPF, (req, resp) => {
 
-  const { cpf } = req.headers
-  const client = customers.find(customer => customer.cpf === parseInt(cpf))
-
-  if(!client) {
-    return resp.status(400).json({error: 'Customer not exists!'})
-  }
-
-  return resp.send(customers.statement)
+  const { customer } = req
+  return resp.send(customer.statement)
 
 })
 
