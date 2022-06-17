@@ -7,7 +7,11 @@ app.use(express.json())
 const customers = []
 
 
-// Middleware
+/**
+ * Middleware que faz a validação se o cliente existe, em caso afirmativo prossegue
+ * a execução da requisição original repassando uma nova propriedade customer que
+ * pode ser interceptada pela rota que a executou.
+ */
 function verifyIfExistsAccountCPF(req, resp, next) {
 
   const { cpf } = req.headers
@@ -24,7 +28,7 @@ function verifyIfExistsAccountCPF(req, resp, next) {
 
 }
 
-
+// Cria uma conta com informações basicas
 app.post('/account', (req, resp) => {
 
   const {name, cpf} = req.body
@@ -48,6 +52,7 @@ app.post('/account', (req, resp) => {
 
 // app.use(verifyIfExistsAccountCPF)
 
+// Retorna o extrato bancário de um cliente existente
 app.get('/statement', verifyIfExistsAccountCPF, (req, resp) => {
 
   const { customer } = req
@@ -55,6 +60,22 @@ app.get('/statement', verifyIfExistsAccountCPF, (req, resp) => {
 
 })
 
+// Insere uma transação bancaria a um cliente existente
+app.post('/deposit', verifyIfExistsAccountCPF, (req, resp) => {
+
+  const { customer } = req
+  const { description, amount } = req.body
+
+  customer.statement.push({
+    description,
+    amount,
+    created_at: new Date(),
+    type: 'credit'
+  })
+
+  return resp.status(201).send(customer)
+
+})
 
 
 app.listen(3000)
