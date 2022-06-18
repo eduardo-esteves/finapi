@@ -50,6 +50,25 @@ app.post('/account', (req, resp) => {
 
 })
 
+app.get('/account', verifyIfExistsAccountCPF, (req, resp) => {
+  const { customer } = req
+  return resp.json(customer)
+})
+
+// Permite uma simples alteração no nome do cliente
+app.put('/account', verifyIfExistsAccountCPF, (req, resp) => {
+
+  const { customer } = req
+  const { name } = req.body
+
+  debugger
+
+  customer.name = name
+
+  return resp.status(201).send(customer)
+
+})
+
 // app.use(verifyIfExistsAccountCPF)
 
 // Retorna o extrato bancário de um cliente existente
@@ -84,8 +103,6 @@ app.get('/statement/by_date', verifyIfExistsAccountCPF, (req, resp) => {
   const { date } = req.query
 
   const dateFormat = new Date(date + ' 00:00')
-
-  debugger
 
   const statement = customer.statement.filter(stat => stat.created_at.toDateString() === new Date(dateFormat).toDateString())
 
